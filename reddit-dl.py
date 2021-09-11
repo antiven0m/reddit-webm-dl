@@ -13,9 +13,9 @@ def massconvert_webm(input_dir):
         os.remove(vid)
 
 def main():
-    parser = argparse.ArgumentParser(description='Downloads a reddit video and converts it to a webm', usage='reddit-dl -u [url] -d c:/memes')
+    parser = argparse.ArgumentParser(description='Downloads a reddit video and converts it to a webm', usage='py reddit-dl.py -u [url] -d c:/memes')
     parser.add_argument('-u', '--url', dest='url', help='The url of the reddit video', required=True)
-    parser.add_argument('-d', '--dir', dest='dir', help='The output directory', default='D:\Pictures\YLYL', required=False)
+    parser.add_argument('-d', '--dir', dest='dir', help='The output directory', required=False)
     args = parser.parse_args()
     download_reddit_video(args.url, args.dir)
 
