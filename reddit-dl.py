@@ -1,24 +1,29 @@
-import os, subprocess, argparse, glob
+import os
+import subprocess
+import glob
+import argparse
 
-def download_reddit_video(url, output_dir):
-    subprocess.call('youtube-dl -o {}/%(title)s.%(ext)s {}'.format(output_dir, url), shell=True)
-    f = glob.glob(output_dir + '\\*.mp4')
-    subprocess.call(['ffmpeg', '-i', os.path.join(output_dir, os.path.basename(f[0])), '-c:v', 'libvpx-vp9', '-crf', '31', '-b:v', '0', os.path.join(output_dir, os.path.basename(f[0])[:-4]) + '.webm'], shell=True)
+
+def dl_reddit_vid(url, quality):
+    subprocess.call('youtube-dl -o %(title)s.%(ext)s {}'.format(url), shell=True, stdout=subprocess.PIPE)
+    f = glob.glob('*.mp4')
+    subprocess.call(['ffmpeg', '-i', os.path.join(os.path.basename(f[0])), '-c:v', 'libvpx-vp9', '-crf', quality, '-b:v', '0', os.path.join(os.path.basename(f[0])[:-4]) + '.webm'], shell=True)
     os.remove(f[0])
 
-def massconvert_webm(input_dir):
-    f = glob.glob(input_dir + '\\*.mp4')
-    for vid in f:
-        subprocess.call(['ffmpeg', '-i', vid, '-c:v', 'libvpx-vp9', '-crf', '31', '-b:v', '0', os.path.basename(vid)[:-4] + '.webm'], shell=True)
-        os.remove(vid)
 
 def main():
-    parser = argparse.ArgumentParser(description='Downloads a reddit video and converts it to a webm', usage='py reddit-dl.py -u [url] -d c:/memes')
-    parser.add_argument('-u', '--url', dest='url', help='The url of the reddit video', required=True)
-    parser.add_argument('-d', '--dir', dest='dir', help='The output directory', required=False)
+    parser = argparse.ArgumentParser(description='Download Reddit videos and convert them to webms.')
+    parser.add_argument('url', help='The URL of the Reddit video post.')
+    parser.add_argument('-q', '--quality', help='The quality of the video. Default is high.', choices=['low', 'medium', 'high'], default='high')
     args = parser.parse_args()
-    download_reddit_video(args.url, args.dir)
+    if args.quality == 'low':
+        quality = '15'
+    elif args.quality == 'medium':
+        quality = '25'
+    elif args.quality == 'high':
+        quality = '35'
+    dl_reddit_vid(args.url, quality)
+
 
 if __name__ == '__main__':
     main()
-    
